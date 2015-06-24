@@ -87,7 +87,8 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                 all     : true,
                 none    : true,
                 reset   : true,
-                filter  : true
+                filter  : true,
+                close   : true
             };
 
             var 
@@ -236,7 +237,7 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                     clearButton     = [];
                 
                 // If available, then get select all, select none, and reset buttons
-                if ( $scope.helperStatus.all || $scope.helperStatus.none || $scope.helperStatus.reset ) {                                                       
+                if ( $scope.helperStatus.all || $scope.helperStatus.none || $scope.helperStatus.reset || $scope.helperStatus.close ) {
                     selectButtons = element.children().children().next().children().children()[ 0 ].getElementsByTagName( 'button' );                    
                     // If available, then get the search box and the clear button
                     if ( $scope.helperStatus.filter ) {                                            
@@ -254,7 +255,7 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                 }
                
                 // Get checkboxes
-                if ( !$scope.helperStatus.all && !$scope.helperStatus.none && !$scope.helperStatus.reset && !$scope.helperStatus.filter ) {
+                if ( !$scope.helperStatus.all && !$scope.helperStatus.none && !$scope.helperStatus.reset && !$scope.helperStatus.close && !$scope.helperStatus.filter ) {
                     checkboxes = element.children().children().next()[ 0 ].getElementsByTagName( 'input' );
                 }
                 else {
@@ -956,6 +957,7 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
             $scope.icon.selectAll  = '&#10003;';    // a tick icon
             $scope.icon.selectNone = '&times;';     // x icon
             $scope.icon.reset      = '&#8630;';     // undo icon            
+            $scope.icon.close      = '&#9167;';     // eject symbol
             // this one is for the selected items
             $scope.icon.tickMark   = '&#10003;';    // a tick icon 
 
@@ -965,7 +967,8 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                 reset: 'Reset',
                 search: 'Search...',
                 nothingSelected: 'None Selected',
-                allSelected: 'All Selected'
+                allSelected: 'All Selected',
+                close: 'Close',
             };
 
             if ( typeof attrs.translation !== 'undefined' )
@@ -978,6 +981,7 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
             $scope.lang.search          = translation.search;                
             $scope.lang.nothingSelected = $sce.trustAsHtml( translation.nothingSelected );                
             $scope.lang.allSelected     = $sce.trustAsHtml( translation.allSelected );
+            $scope.lang.close           = $sce.trustAsHtml( $scope.icon.close      + '&nbsp;&nbsp;' + translation.close );
 
             $scope.icon.tickMark = $sce.trustAsHtml( $scope.icon.tickMark );
                 
@@ -1056,9 +1060,9 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
             // overlay layer
             '<div class="checkboxLayer">' +
                 // container of the helper elements
-                '<div class="helperContainer" ng-if="helperStatus.filter || helperStatus.all || helperStatus.none || helperStatus.reset ">' +
+                '<div class="helperContainer" ng-if="helperStatus.filter || helperStatus.all || helperStatus.none || helperStatus.reset || helperStatus.close ">' +
                     // container of the first 3 buttons, select all, none and reset
-                    '<div class="line" ng-if="helperStatus.all || helperStatus.none || helperStatus.reset ">' +
+                    '<div class="line" ng-if="helperStatus.all || helperStatus.none || helperStatus.reset || helperStatus.close ">' +
                         // select all
                         '<button type="button" class="helperButton"' +
                             'ng-disabled="isDisabled"' + 
@@ -1073,6 +1077,13 @@ angular.module( 'isteven-multi-select', ['ng'] ).directive( 'istevenMultiSelect'
                             'ng-click="select( \'none\', $event );"' +
                             'ng-bind-html="lang.selectNone">' +
                         '</button>'+
+                        // close
+                        '<button type="button" class="helperButton closeButton"' +
+                            'ng-disabled="isDisabled"' + 
+                            'ng-if="helperStatus.close"' +
+                            'ng-click="toggleCheckboxes($event)"' +
+                            'ng-bind-html="lang.close">'+
+                        '</button>' +
                         // reset
                         '<button type="button" class="helperButton reset"' +
                             'ng-disabled="isDisabled"' + 
